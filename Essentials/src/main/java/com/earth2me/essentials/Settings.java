@@ -441,6 +441,10 @@ public class Settings implements net.ess3.api.ISettings {
         return BigDecimal.ZERO;
     }
 
+    public boolean getConfirmCommandCost(){
+        return config.getBoolean("confirm-command-cost", true);
+    }
+
     private Set<String> _getSocialSpyCommands() {
         final Set<String> socialspyCommands = new HashSet<>();
 

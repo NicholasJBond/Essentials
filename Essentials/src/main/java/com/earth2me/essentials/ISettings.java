@@ -60,6 +60,8 @@ public interface ISettings extends IConf {
 
     BigDecimal getCommandCost(String label);
 
+    boolean getConfirmCommandCost();
+
     String getCurrencySymbol();
 
     boolean isCurrencySymbolSuffixed();

@@ -825,6 +825,10 @@ command-costs:
   # /kit tools costs $1500 PER USE
   #kit-tools: 1500
 
+# Set to true if you want to warn the player of the amount of money it will cost to use the /back command. Player then
+# needs to use /back confirm.
+confirm-command-cost: true;
+
 # Set this to a currency symbol you want to use.
 # Remember, if you want to use special characters in this document, 
 # such as accented letters, you MUST save the file as UTF-8, not ANSI.

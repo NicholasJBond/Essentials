@@ -3,9 +3,11 @@ package com.earth2me.essentials.commands;
 import com.earth2me.essentials.CommandSource;
 import com.earth2me.essentials.Trade;
 import com.earth2me.essentials.User;
+import com.earth2me.essentials.utils.NumberUtil;
 import net.ess3.api.TranslatableException;
 import org.bukkit.Server;
 
+import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
 
@@ -22,7 +24,11 @@ public class Commandback extends EssentialsCommand {
             return;
         }
 
-        teleportBack(sender, user, commandLabel);
+        if (args.length == 1 && "confirm".equals(args[0])){
+            teleportBack(sender, user, commandLabel, true);
+        }else{
+            teleportBack(sender, user, commandLabel, false);
+        }
     }
 
     @Override
@@ -37,10 +43,10 @@ public class Commandback extends EssentialsCommand {
     private void parseOthers(final Server server, final CommandSource sender, final String[] args, final String commandLabel) throws Exception {
         final User player = getPlayer(server, args, 0, true, false);
         sender.sendTl("backOther", player.getName());
-        teleportBack(sender, player, commandLabel);
+        teleportBack(sender, player, commandLabel, true);
     }
 
-    private void teleportBack(final CommandSource sender, final User user, final String commandLabel) throws Exception {
+    private void teleportBack(final CommandSource sender, final User user, final String commandLabel, boolean confirmed) throws Exception {
         if (user.getLastLocation() == null) {
             throw new TranslatableException("noLocationFound");
         }
@@ -59,15 +65,17 @@ public class Commandback extends EssentialsCommand {
                 throw new TranslatableException("noPerm", "essentials.back.into." + lastWorldName);
             }
         }
-
+        final Trade charge = new Trade(this.getName(), this.ess);
+        final BigDecimal cost = charge.getCommandCost(user);
+        if (!cost.equals(BigDecimal.ZERO) && !confirmed && ess.getSettings().getConfirmCommandCost()){
+            throw new TranslatableException("confirmCommandCost", this.getName(), NumberUtil.shortCurrency(cost, ess));
+        }
         if (requester == null) {
             user.getAsyncTeleport().back(null, null, getNewExceptionFuture(sender, commandLabel));
         } else if (!requester.equals(user)) {
-            final Trade charge = new Trade(this.getName(), this.ess);
             charge.isAffordableFor(requester);
             user.getAsyncTeleport().back(requester, charge, getNewExceptionFuture(sender, commandLabel));
         } else {
-            final Trade charge = new Trade(this.getName(), this.ess);
             charge.isAffordableFor(user);
             user.getAsyncTeleport().back(charge, getNewExceptionFuture(sender, commandLabel));
         }
